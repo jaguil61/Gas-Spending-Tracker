@@ -51,7 +51,7 @@ def get_money_and_date(email_file_name, dates_filled_up):
     money_spent = 0
     money_pattern = re.compile(r"Amount Paid:? \$\d+\.\d{2}")
     date_pattern = re.compile(r"\b(0[1-9]|1[0-2])-\d{2}-(\d{4})\b") #Gets the month and year
-    fill_date = ""
+    date_match = ""
 
     #Open file
     with open(email_file_name, 'rb') as f:
@@ -68,15 +68,12 @@ def get_money_and_date(email_file_name, dates_filled_up):
 
     #Go through body and find the string that has the money spent as well as the date
     money_match = re.search(money_pattern, email_body)
-    date_match = re.search(date_pattern, email_body)
+    date_match = re.search(date_pattern, email_body).group()
 
-    if date_match:
-        fill_date = date_match.group()
-    else:
-        print("Error with: ", email_file_name)
+    #Removes the day from the date and only leaves the month-year
+    date_match = date_match[:2] + date_match[5:]
 
-    #Removes the day from the date and only leaves the month/year
-    dates_filled_up.append(fill_date[:2] + fill_date[5:])
+    dates_filled_up.append(date_match)
 
     #Remove the text in front of the amount paid and convert it to a float
     money_spent = float(money_match.group().replace("Amount Paid: $", "").replace("Amount Paid $", ""))
@@ -85,7 +82,7 @@ def get_money_and_date(email_file_name, dates_filled_up):
     
     return money_spent
 
-#This helper function gets the average amount of times per month we filled up
+#This helper function gets the average amount of times we filled up per month
 def get_average_fill_ups(dates_filled_up):
     average_times_filled = 0.0
     times_filled_per_month = []
