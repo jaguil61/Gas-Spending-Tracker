@@ -46,8 +46,10 @@ def print_email_contents(email_file_name):
 
 #Helper function that gets the money spent from one receipt as well as the month and year
 def get_money_and_date(email_file_name, dates_filled_up):
+    #print("File Name: ", email_file_name)
+
     money_spent = 0
-    money_pattern = re.compile(r"Amount Paid: \$\d+\.\d{2}")
+    money_pattern = re.compile(r"Amount Paid:? \$\d+\.\d{2}")
     date_pattern = re.compile(r"\b(0[1-9]|1[0-2])-\d{2}-(\d{4})\b") #Gets the month and year
     fill_date = ""
 
@@ -66,12 +68,18 @@ def get_money_and_date(email_file_name, dates_filled_up):
 
     #Go through body and find the string that has the money spent as well as the date
     money_match = re.search(money_pattern, email_body)
-    fill_date = re.search(date_pattern, email_body).group()
+    date_match = re.search(date_pattern, email_body)
 
-    dates_filled_up.append(fill_date)
+    if date_match:
+        fill_date = date_match.group()
+    else:
+        print("Error with: ", email_file_name)
+
+    #Removes the day from the date and only leaves the month/year
+    dates_filled_up.append(fill_date[:2] + fill_date[5:])
 
     #Remove the text in front of the amount paid and convert it to a float
-    money_spent = float(money_match.group().replace("Amount Paid: $", ""))
+    money_spent = float(money_match.group().replace("Amount Paid: $", "").replace("Amount Paid $", ""))
     
     #print("Date: ", fill_date, ", Money Spent: ", money_spent)
     
@@ -81,11 +89,6 @@ def get_money_and_date(email_file_name, dates_filled_up):
 def get_average_fill_ups(dates_filled_up):
     average_times_filled = 0.0
     times_filled_per_month = []
-    
-    #Go through dates and remove the day
-    for i, date_formatted in enumerate(dates_filled_up):
-        date_formatted = date_formatted[:2] + date_formatted[5:]
-        dates_filled_up[i] = date_formatted
     
     #Create list with unique dates and how many times each one occurred
     times_filled_per_month = Counter(dates_filled_up)
