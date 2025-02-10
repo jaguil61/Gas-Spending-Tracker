@@ -1,0 +1,3 @@
+#Files that can be ignored
+.DS_Store
+*.eml

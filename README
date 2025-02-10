@@ -1,0 +1,6 @@
+This program is for tracking gas spending. It does this by scraping Shell email receipts
+calculating the average.
+May not be completely accurate due to not always getting gas at shell gas stations.
+
+To use place the shell e-receipts in the folder "Email-Receipts and run the python script.
+command: python3 main.py
